@@ -65,3 +65,15 @@ You should see the same app graph, but this time the Dapr state store is being h
 ```
 TODO
 ```
+
+## Step 5.4: Clean up
+
+When you're done, you can clean up your application's resources, including the Azure resources, by running:
+
+```bash
+rad app delete lab -y
+```
+
+## Next steps
+
+Now that we've taken our application and run it both locally and in Azure, let's explore some other features of Radius.
