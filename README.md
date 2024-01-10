@@ -1,5 +1,7 @@
 # Radius Lab Session
 
+> 🏗️ This lab is currently under construction. Please stay tuned as we make progress and share additional information.
+
 Welcome to the Radius lab! This repo contains a step-by-step guide to initializing and running your first Radius application. In this 60-minute lab, you will:
 
 - Install the Radius (rad) CLI
