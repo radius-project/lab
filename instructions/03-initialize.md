@@ -36,7 +36,7 @@ Once the installation is complete, you can verify Radius is running by running t
 kubectl get pods -n radius-system
 ```
 
-You'll see the Radius control-plane pods running:
+You'll see the Radius control-plane pods and some Contour pods running:
 
 ```
 NAME                               READY   STATUS    RESTARTS   AGE
@@ -44,11 +44,11 @@ ucp-5d784f9b5d-rg7qk               1/1     Running   0          54s
 applications-rp-697cdf6b-lp4gk     1/1     Running   0          54s
 bicep-de-567fbc6c85-hnvzv          1/1     Running   0          54s
 controller-74d4ccfb48-w4bf5        1/1     Running   0          54s
-contour-envoy-hxhvr                0/2     Pending   0          42s
+contour-envoy-hxhvr                2/2     Running   0          42s
 contour-contour-6bbbd945d9-cqv8h   1/1     Running   0          42s
 ```
 
-> 💡 Radius is not a typical Kubernetes controller. Instead, it leverages the Universal Control Plane service and Resource Providers just like Azure. The goal is for Radius to be able to run across any platform, not just Kubernetes. For more information on the Radius architecture, visit our [architecture docs](https://docs.radapp.io/concepts/architecture/).
+> 💡 Radius is not a Kubernetes controller. Instead, it leverages the Universal Control Plane service and Resource Providers just like Azure. The goal is for Radius to be able to run across any platform, not just Kubernetes. For more information on the Radius architecture, visit our [architecture docs](https://docs.radapp.io/concepts/architecture/).
 
 ## Step 3.3: Verify the environment was created
 
@@ -150,7 +150,7 @@ A couple things to note about this response:
 1. The `compute` section shows that this environment is backed by Kubernetes and is uses the `default` namespace as a base. When applications are deployed into this environment, they will be deployed to Kubernetes, based on this namespace. In the future additional runtimes, such as serverless AWS/Azure infrastructure, can be supporterd here. But for now it's just Kubernetes.
 1. The resource id, `/planes/radius/local/resourcegroups/default/providers/Applications.Core/environments/default`, looks a lot like an Azure Resource Manager (ARM) ID. Radius extends ARM to support any cloud, not just Azure, which introduces the concept of "planes". We'll pop back and explore this more in a later step.
 
-## Step 3.4: Examine a Recipes
+## Step 3.4: Examine a Recipe
 
 Let's take a look at one of the Recipes that was added to the environment. Run the following command to learn more about this Recipe:
 

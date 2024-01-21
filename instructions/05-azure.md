@@ -6,26 +6,12 @@ Now that you've got your application running locally, let's deploy it to Azure.
 
 In order for your Radius environment to be able to deploy resources into Azure, you'll need to configure your Azure credentials. Radius uses Azure service principals to authenticate with Azure, so you'll need to create a new service principal and configure it with the appropriate permissions.
 
-1. Log into your az CLI:
-    
-    ```bash
-    # If running locally, use the interactive login:
-    az login
-
-    # If running in a Codespace, use a device code:
-    az login --use-device-code
-    ```
-1. Create an Azure resource group in your preferred region:
-
-    ```bash
-    az group create -n radius-lab -l westus3
-    ```
 1. Create a new service principal with Owner access to the resource group:
 
     ```bash
-    az ad sp create-for-rbac -n radius-lab --role Owner --scopes /subscriptions/<your-subscription-id>/resourceGroups/radius-lab
+    az ad sp create-for-rbac -n radius-lab --role Owner --scopes /subscriptions/<your-subscription-id>/resourceGroups/<your-resource-group>
     ```
-1. Add these new service principal credentials to your Radius installation. This will tell Radius _how_ to deploy Azure resources:
+1. Add the new service principal credentials to your Radius installation. This will tell Radius _how_ to deploy Azure resources:
 
     ```bash
     rad credential register azure --client-id <app id> --client-secret <password> --tenant-id <tenant>
@@ -43,6 +29,8 @@ In order to deploy Azure infrastructure, **all you'll need to do is swap out the
 ```bash
 rad recipe register default --resource-type Applications.Dapr/stateStores --template-kind bicep --template-path ghcr.io/radius-project/recipes/azure/statestores:latest
 ```
+
+You can find the source for this Recipe [here](https://github.com/radius-project/recipes/blob/main/azure/statestores.bicep).
 
 ## Step 5.3: Re-run your application
 
@@ -63,8 +51,27 @@ rad app graph lab
 You should see the same app graph, but this time the Dapr state store is being hosted in Azure:
 
 ```
-TODO
+Name: demo (Applications.Core/containers)
+Connections:
+  statestore (Applications.Dapr/stateStores) -> demo
+Resources:
+  demo (apps/Deployment)
+  demo (core/Secret)
+  demo (core/Service)
+  demo (core/ServiceAccount)
+  demo (rbac.authorization.k8s.io/Role)
+  demo (rbac.authorization.k8s.io/RoleBinding)
+
+Name: statestore (Applications.Dapr/stateStores)
+Connections: (none)
+Resources:
+  recipe2lkqwvspyl24g (Microsoft.Storage/storageAccounts) open portal
+  default (Microsoft.Storage/storageAccounts/blobServices) open portal
+  statestore (Microsoft.Storage/storageAccounts/blobServices/containers) open portal
+  statestore (dapr.io/Component)
 ```
+
+Try clicking on the `open portal` links to see the Azure resources that were deployed. You'll be deep-linked into the Azure portal for that specific resource.
 
 ## Step 5.4: Clean up
 
@@ -76,4 +83,4 @@ rad app delete lab -y
 
 ## Next steps
 
-Now that we've taken our application and run it both locally and in Azure, let's explore some other features of Radius.
+Now that we've taken our application and run it both locally and in Azure, let's take a look at one more feature of Radius, where you can use Radius with existing Kubernetes YAML. Check [it out here](./06-yaml.md).

@@ -36,7 +36,7 @@ resource application 'Applications.Core/applications@2023-10-01-preview' = {
 }
 ```
 
-Great! We now have a new application. Let's now add some resources to it.
+We now have a new application named "lab". Let's now add some resources to it.
 
 ## Step 4.2: Add a container
 
@@ -53,11 +53,6 @@ resource container 'Applications.Core/containers@2023-10-01-preview' = {
         web: {
           containerPort: 3000
         }
-      }
-    }
-    connections: {
-      statestore: {
-        source: statestore.id
       }
     }
     extensions: [
@@ -94,7 +89,7 @@ Central to Radius is the notion that applications are more than just lists of re
 
 Update your container definition to look like the following:
 
-```bicep
+```diff
 resource container 'Applications.Core/containers@2023-10-01-preview' = {
   name: 'demo'
   properties: {
@@ -107,11 +102,11 @@ resource container 'Applications.Core/containers@2023-10-01-preview' = {
         }
       }
     }
-    connections: {
-      statestore: {
-        source: statestore.id
-      }
-    }
++   connections: {
++     statestore: {
++       source: statestore.id
++     }
++   }
     extensions: [
       {
         kind: 'daprSidecar'
@@ -128,6 +123,8 @@ By this point, your `app.bicep` file should look like the following:
 <summary>app.bicep</summary>
 
 ```bicep
+// Import the set of Radius resource types
+// (Applications.Core, Applications.Dapr, etc.)
 import radius as rad
 
 @description('The environment ID to deploy the application and its resourcs into. Passed in automatically by the rad CLI.')
@@ -314,11 +311,9 @@ demo Server is running at http://localhost:3000
 
 ## Step 4.8: Interact with the application
 
-If a browser window didn't automatically open, you can open a browser and navigate to http://localhost:3000 to see the application running. You should see a demo app which tells you a little bit about the application and the environment it's running in.
+Open a browser and navigate to http://localhost:3000 to see the application running. You should see a demo app which tells you a little bit about the application and the environment it's running in. You'll see the set of environment variables that were injected into the container, including the connection information for the Dapr state store.
 
-> If running on a Codespace and a browser didn't open automatically, check your pop-up blocker. You can also open the `PORTS` tab next to the `TERMINAL` tab to see the port forwarding and open the link from there.
-
-##TODO: Add a screenshot of the app running
+![ToDo Homepage](./images/04-todo-home.png)
 
 Once you're done, you can press `Ctrl+C` to stop the `rad run` command.
 
