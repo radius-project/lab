@@ -1,7 +1,5 @@
 # Radius Lab Session
 
-> 🏗️ This lab is currently under construction. Please stay tuned as we make progress and share additional information.
-
 Welcome to the Radius lab! This repo contains a step-by-step guide to initializing and running your first Radius application. In this 60-minute lab, you will:
 
 - Install the Radius (rad) CLI
@@ -23,7 +21,6 @@ The easiest way to run this lab is via GitHub Codespaces. Simply open a Codespac
 
 If you prefer to run the lab locally, you will need to install the following tools:
 
-1. [Docker](https://docs.docker.com/get-docker/)
 2. [kubectl](https://kubernetes.io/docs/tasks/tools/)
 3. [Helm](https://helm.sh/docs/intro/install/)
 4. [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
@@ -31,4 +28,4 @@ If you prefer to run the lab locally, you will need to install the following too
 
 ## Lab instructions
 
-Ready to get started? Head over to the [lab instructions](./instructions) to begin.
+Ready to get started? Head over to the [lab instructions](./instructions/README.md) to begin.
