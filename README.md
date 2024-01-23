@@ -11,7 +11,7 @@ Welcome to the Radius lab! This repo contains a step-by-step guide to initializi
 
 ## Lab setup
 
-### GitHub Codespaces (preferred)
+### GitHub Codespaces
 
 The easiest way to run this lab is via GitHub Codespaces. Simply open a Codespace and you're ready to get going:
 
