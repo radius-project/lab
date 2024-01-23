@@ -32,6 +32,8 @@ rad recipe register default --resource-type Applications.Dapr/stateStores --temp
 
 You can find the source for this Recipe [here](https://github.com/radius-project/recipes/blob/main/azure/statestores.bicep).
 
+> 💡 Note that the application definition didn't need to change at all, just the Recipe template. When Radius & Dapr are combined, application definitions become fully portable across code + dependencies.
+
 ## Step 5.3: Re-run your application
 
 Re-run your same `app.bicep` file, without any changes:

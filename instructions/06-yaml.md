@@ -2,6 +2,8 @@
 
 In this step, you'll learn how to use Radius to annotate existing Kubernetes YAML files with Radius metadata. This allows you to use Radius with existing Kubernetes YAML files.
 
+> 💡 While Radius itself is not a Kubernetes controller, we do have a controller as a _client_, which connects to the Radius resource provider. This allows you to leverage Radius from within your Helm charts and Kubernetes YAML without needing to migrate to Bicep.
+
 ## Step 6.1: Define a YAML file
 
 Let's start by defining a simple YAML file that we'll use for this step. Create a file called `app.yaml`:
@@ -126,6 +128,14 @@ Now, let's add a Recipe to the application. This will allow us to add a Redis Ca
    ```bash
    kubectl apply -f app.yaml
    ```
+
+1. Verify the Recipe CRD was created:
+
+   ```bash
+   kubectl get recipes
+   ```
+
+   You should see the Recipe being applied, or succeeded.
 
 1. Show your application graph again:
 

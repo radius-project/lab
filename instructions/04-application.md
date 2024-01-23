@@ -67,6 +67,8 @@ resource container 'Applications.Core/containers@2023-10-01-preview' = {
 
 This will add a container to our application, using the `ghcr.io/radius-project/samples/demo:latest` image. This image is a simple Node.js application that serves a web page on port 3000. We'll also add the `daprSidecar` extension which will add a Dapr sidecar to our container.
 
+> 💡 Radius containers are an abstraction that allow developers to define their workloads, and then defer to the environment operator to define how they're deployed. In this example, the developer asked for a container, and the environment is setup to deploy to Kubernetes. In the future, other container runtimes will be supported, such as serverless AWS/Azure infrastructure.
+
 ## Step 4.3: Add a Dapr state store
 
 Next, let's add a Dapr state store to our application. Add the following to the end of the `app.bicep` file:
@@ -81,7 +83,7 @@ resource statestore 'Applications.Dapr/stateStores@2023-10-01-preview' = {
 }
 ```
 
-> 💡 Developers don't need to think about underlying infrastructure in Radius. Instead, they think in terms of the dependencies and APIs they need. In this example, the developer asked for a Dapr state store, and will defer to the environment operator to define how the underlying infrastructure is deployed.
+> 💡 Developers don't need to think about underlying infrastructure in Radius. Instead, they think in terms of the dependencies and APIs they need. In this example, the developer asked for a Dapr state store, and will defer to the environment operator to define how the underlying infrastructure is deployed. In this case, the "default" Recipe will be deployed, which is currently a lightweight Redis instance for running Dapr.
 
 ## Step 4.4: Add a connection
 
@@ -238,7 +240,7 @@ Resources:
 
 This output contains all of the resources in the `lab` app, along with the underlying Kubernetes resources that were deployed to support it.
 
-You can validate these resources were deployed by running the following command:
+You can go "under the hood" and validate these resources were deployed to Kubernetes by running the following command:
 
 ```bash
 kubectl get all -n default-lab
