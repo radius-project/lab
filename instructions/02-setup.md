@@ -65,7 +65,7 @@ Make sure you have the following tools installed on your machine:
 
 ## 2.4 Install the Radius-Bicep VSCode extension
 
-Install the Radius-Bicep extension from the [VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-bicep):
+Install the Bicep extension from the [VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-bicep):
    ```bash
    code --install-extension ms-azuretools.vscode-bicep
    ```
