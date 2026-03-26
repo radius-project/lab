@@ -1,4 +1,4 @@
-# Radius Customer Support Agent
+# Contoso Customer Support Agent
 
 This sample demonstrates how to build and deploy an **agentic AI application** using [Radius](https://radapp.io), an open-source application platform that enables developers and platform engineers to define, deploy, and manage cloud-native applications across any infrastructure.
 
@@ -6,13 +6,13 @@ This sample demonstrates how to build and deploy an **agentic AI application** u
 
 Building AI applications today is hard. A developer who wants to build an AI agent goes through the toil of understanding infrastructure dependencies like Azure OpenAI deployments, configuring AI Search indexes, setting up managed identities with the right RBAC roles, provisioning storage accounts and more over conforming to the requirements of the enterprise. This creates a high barrier to entry for developers and slows down innovation.
 
-Radius solves this by enabling **platform engineers** to define abstract, application-oriented **Resource Types** and, separately, **Recipes** which implement those Resource Types using Infrastructure as Code (IaC). The developer just declares what application resources(an AI agent, a database, a frontend) they need in an application definition and Radius handles the deployment of the resources.
+Radius solves this by enabling **platform engineers** to define abstract, application-oriented **Resource Types** and, separately, **Recipes** which implement those Resource Types using Infrastructure as Code (IaC). The developer just declares what application resources (an AI agent, a database, a frontend) they need in an application definition and Radius handles the deployment of the resources.
 
 ## Customer Support Agent Application
 
 This sample is a customer support agent application for the fictional **Contoso Online Store**. Unlike a simple chatbot, this agent autonomously reasons about customer requests, decides which tools to use, takes actions (like cancelling orders or initiating returns), and chains multiple operations together.  It uses several Azure services including [Azure OpenAI](https://learn.microsoft.com/azure/ai-services/openai/).
 
-Below is a high-level architecture diagram of the application
+Below is a high-level architecture diagram of the application:
 
 <p align="center">
   <img src="images/application.png">
@@ -31,13 +31,14 @@ At the completion of this walkthrough, the application and Radius configuration 
 ├── scripts/setup-azure.sh   # One-command Azure prerequisite setup
 ├── src/
 │   ├── agent-runtime/       # Agentic backend (FastAPI + OpenAI tool calling)
-│   └── web/                 # Chat UI frontend (nginx)
+│   ├── web/                 # Chat UI frontend (nginx)
+│   └── prompt.txt           # Prompt for the customer support agent
 └── radius/
-    ├── app.bicep             # Application definition (what the developer writes)
-    ├── env.bicep             # Environment + shared resources
-    ├── types/                # Custom resource type schemas (AI, Data, Storage)
-    ├── extensions/           # Generated Bicep extensions (.tgz)
-    └── recipes/              # IaC templates (agent, postgres, blobstorage)
+    ├── app.bicep            # Application definition (what the developer writes)
+    ├── env.bicep            # Environment + shared resources
+    ├── types/               # Custom resource type schemas (AI, Data, Storage)
+    ├── extensions/          # Generated Bicep extensions (.tgz)
+    └── recipes/             # IaC templates (agent, postgres, blobstorage)
 ```
 
 ## 🎯 Goals
@@ -53,7 +54,7 @@ By the end of this walkthrough, you will:
 Before you begin, you need:
 
 - An Azure subscription
-- [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) installed
+- [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) installed and authenticated
 - [Radius CLI](https://docs.radapp.io/tutorials/install-radius/#install-the-radius-cli) installed
 - [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl) installed
 
@@ -84,21 +85,21 @@ Run the setup script to create an Azure resource group, AKS cluster, service pri
 **Bash**
 
 ```bash
-./scripts/setup-azure.sh --location westus3 --resource-group customer-agent --cluster-name customer-agent-aks
+./scripts/setup-azure.sh --location westus3 --resource-group customer-support-agent --cluster-name customer-support-agent-aks
 ```
 
 **PowerShell**
 
 ```powershell
-bash ./scripts/setup-azure.sh --location westus3 --resource-group customer-agent --cluster-name customer-agent-aks
+bash ./scripts/setup-azure.sh --location westus3 --resource-group customer-support-agent --cluster-name customer-support-agent-aks
 ```
 
 > [!NOTE]
 > This takes a few minutes (mostly AKS cluster creation).
 >
-> - `--resource-group <name>` name of the resource group to create. The script will create one if it doesn't exist. Defaults to `customer-agent`.
+> - `--resource-group <name>` name of the resource group to create. The script will create one if it doesn't exist. Defaults to `customer-support-agent`.
 > - `--location <region>` region for the resource group and AKS cluster. Defaults to `westus3`.
-> - `--cluster-name <your-cluster-name>` name of the AKS cluster. The script will detect it and skip creation if it already exists. Defaults to `customer-agent-aks`.
+> - `--cluster-name <your-cluster-name>` name of the AKS cluster. The script will detect it and skip creation if it already exists. Defaults to `customer-support-agent-aks`.
 
 The script will output the next steps. Service principal credentials are saved to `.azure-sp.env` for use in the next step.
 
@@ -292,7 +293,7 @@ rad workspace create kubernetes azure `
 Confirm the environment was created from the previous step::
 
 ```bash
-rad environment show -o json
+rad environment show
 ```
 
 Now lets look at the recipes added to the environment. A Recipe defines *how* to provision a Resource Type. Recipes are Infrastructure as Code templates, Bicep in this sample, that Radius executes when you deploy a resource of a given type. They receive context from Radius (the resource name, properties, connections) and output infrastructure.
@@ -309,6 +310,12 @@ default   Radius.Storage/blobStorages       bicep          ghcr.io/radius-projec
 ```
 
 **Developer never sees these recipes**. They just declare `resource agent 'Radius.AI/agents' = { ... }` in their `app.bicep`, and Radius automatically finds and executes the matching recipe configured by the platform engineer in the environment.
+
+You can also see the recipes in the JSON of the environment:
+
+```bash
+rad environment show -o json
+```
 
 <details>
 <summary>Learn about making changes to recipes (click to expand)</summary>
@@ -328,6 +335,8 @@ rad bicep publish \
   --file radius/recipes/blobstorage.bicep \
   --target br:ghcr.io/<org-name>/recipes/blobstorage:1.0
 ```
+
+You will then need to update `env.bicep` and redeploy it.
 </details>
 
 ### Step 8: Create shared resources
@@ -384,7 +393,7 @@ Upload them to the blob storage account that was provisioned in the previous ste
 Get the storage account name (provisioned by the blobstorage recipe):
 
 ```bash
-STORAGE_ACCOUNT=$(az storage account list --resource-group customer-agent \
+STORAGE_ACCOUNT=$(az storage account list --resource-group customer-support-agent \
   --query "[?tags.\"radius-resource-type\"=='Radius.Storage/blobStorages'].name" -o tsv)
 ```
 
@@ -405,7 +414,7 @@ Get the storage account name (provisioned by the blobstorage recipe):
 
 ```powershell
 $STORAGE_ACCOUNT = az storage account list `
-  --resource-group customer-agent `
+  --resource-group customer-support-agent `
   --query "[?tags.`"radius-resource-type`"=='Radius.Storage/blobStorages'].name" `
   -o tsv
 ```
@@ -442,11 +451,11 @@ When the deployment is complete, you should see output similar to:
 ```
 Deployment In Progress...
 
-Completed            contoso-support-agent  Applications.Core/applications
-Completed            contoso-db             Radius.Data/postgreSqlDatabases
+Completed            contoso-support-agent   Applications.Core/applications
+Completed            contoso-db              Radius.Data/postgreSqlDatabases
 Completed            contoso-knowledge-base  Radius.Storage/blobStorages
-Completed            support-agent   Radius.AI/agents
-Completed            frontend-ui     Applications.Core/containers
+Completed            support-agent           Radius.AI/agents
+Completed            frontend-ui             Applications.Core/containers
 
 Deployment Complete
 
@@ -510,7 +519,7 @@ The agent will recognize the customer's frustration and call `create_support_tic
 1. Delete the Azure resource group:
 
     ```bash
-    az group delete --name customer-agent --yes
+    az group delete --name customer-support-agent --yes
     ```
 
 1. Delete the service principal:
@@ -530,7 +539,7 @@ The agent will recognize the customer's frustration and call `create_support_tic
     ```bash
     az cognitiveservices account purge \
       --name support-agent-openai \
-      --resource-group customer-agent \
+      --resource-group customer-support-agent \
       --location westus3
     ```
 

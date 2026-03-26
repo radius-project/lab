@@ -7,14 +7,14 @@ set -euo pipefail
 # Saves service principal credentials to .azure-sp.env for use by Radius.
 #
 # Usage:
-#   ./scripts/setup-azure.sh                                 # defaults: westus3, customer-agent
+#   ./scripts/setup-azure.sh                                 # defaults: westus3, customer-support-agent
 #   ./scripts/setup-azure.sh --location eastus2              # custom location
 #   ./scripts/setup-azure.sh --resource-group my-rg          # custom resource group name
 #   ./scripts/setup-azure.sh --cluster-name my-aks           # uses existing cluster or creates one
 
-RESOURCE_GROUP="customer-agent"
+RESOURCE_GROUP="customer-support-agent"
 LOCATION="westus3"
-CLUSTER_NAME="customer-agent-aks"
+CLUSTER_NAME="customer-support-agent-aks"
 SP_NAME="radius-sp"
 
 # Parse arguments
@@ -126,7 +126,4 @@ echo ""
 echo "================================================"
 echo "  Azure setup complete!"
 echo "================================================"
-echo ""
-echo "Next steps:"
-echo "  Continue with the README walkthrough."
 echo ""

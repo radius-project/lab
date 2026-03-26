@@ -34,7 +34,7 @@ var storageAccountName = context.resource.connections.?blobstorage.?properties.?
 var storageAccountKey = context.resource.connections.?blobstorage.?properties.?accountKey ?? ''
 var storageContainer = context.resource.connections.?blobstorage.?properties.?container ?? 'documents'
 
-var uniqueSuffix = uniqueString(context.resource.id, resourceGroup().id)
+var uniqueSuffix = take(uniqueString(context.resource.id, resourceGroup().id), 8)
 
 var tags = {
   'radius-app': name
@@ -81,7 +81,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
 // ── Azure AI Search ─────────────────────────────────────────
 
 resource aiSearch 'Microsoft.Search/searchServices@2023-11-01' = {
-  name: '${name}-search'
+  name: '${name}-search-${uniqueSuffix}'
   location: location
   tags: tags
   identity: {
@@ -105,7 +105,7 @@ resource aiSearch 'Microsoft.Search/searchServices@2023-11-01' = {
 // ── Azure OpenAI ────────────────────────────────────────────
 
 resource openAi 'Microsoft.CognitiveServices/accounts@2023-10-01-preview' = {
-  name: '${name}-openai'
+  name: '${name}-openai-${uniqueSuffix}'
   location: location
   tags: tags
   kind: 'OpenAI'
@@ -113,7 +113,7 @@ resource openAi 'Microsoft.CognitiveServices/accounts@2023-10-01-preview' = {
     name: openAiSkuName
   }
   properties: {
-    customSubDomainName: '${name}-openai-${take(uniqueSuffix, 6)}'
+    customSubDomainName: '${name}-openai-${uniqueSuffix}'
     publicNetworkAccess: 'Enabled'
   }
 }
