@@ -416,7 +416,10 @@ az storage blob upload-batch \
 Get the storage account name (provisioned by the blobstorage recipe):
 
 ```powershell
-$STORAGE_ACCOUNT= az storage account list ` --resource-group customer-support-agent ` --query "[].{Name:name}" ` --output tsv      
+$STORAGE_ACCOUNT = az storage account list `
+  --resource-group customer-support-agent `
+  --query "[].name" `
+  --output tsv
 ```
 
 Upload all PDFs to the 'documents' container:
@@ -536,10 +539,21 @@ The agent will recognize the customer's frustration and call `create_support_tic
 
 1. Purge your AI resources from Azure
 
+    **Bash**
+
     ```bash
     az cognitiveservices account purge \
       --name support-agent-openai \
       --resource-group customer-support-agent \
+      --location westus3
+    ```
+
+    **PowerShell**
+
+    ```powershell
+    az cognitiveservices account purge `
+      --name support-agent-openai `
+      --resource-group customer-support-agent `
       --location westus3
     ```
 
