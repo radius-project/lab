@@ -59,7 +59,7 @@ Before you begin, you need:
 >
 > - WSL (recommended)
 > - Git Bash
-> - Azure Cloud Shell
+> - [Azure Cloud Shell](https://shell.azure.com/)
 >
 > `jq` is required for parsing JSON output in Bash. Install it depending on the bash environment. PowerShell users can follow along with minor syntax adjustments (examples provided where needed).
 
