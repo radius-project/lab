@@ -14,19 +14,15 @@ This sample is a customer support agent application for the fictional **Contoso 
 
 Below is a high-level architecture diagram of the application:
 
-<p align="center">
-  <img src="images/application.png">
-</p>
+![Application](./images/application.png)
 
 At the completion of this walkthrough, the application and Radius configuration will look like:
 
-<p align="center">
-  <img src="images/radius-config.png">
-</p>
+![Config](./images/radius-config.png)
 
 ## 📁 Repository structure
 
-```
+```text
 ├── knowledge-base/          # Contoso policy PDFs for RAG
 ├── scripts/setup-azure.sh   # One-command Azure prerequisite setup
 ├── src/
@@ -91,10 +87,7 @@ Run the setup script to create an Azure resource group, AKS cluster, service pri
 **PowerShell**
 
 ```powershell
-
-(Get-Content .\scripts\setup-azure.sh -Raw) -replace "`r`n","`n" | Set-Content .\scripts\setup-azure.sh -Encoding UTF8
-
-bash ./scripts/setup-azure.sh --location westus3 --resource-group customer-support-agent --cluster-name customer-support-agent-aks
+./scripts/setup-azure.ps1 -Location westus3 -ResourceGroupName customer-support-agent -ClusterName customer-support-agent-aks
 ```
 
 > [!NOTE]
@@ -139,7 +132,7 @@ kubectl get pods -n radius-system
 
 You should see all Radius pods running:
 
-```
+```text
 NAME                READY   STATUS    RESTARTS   AGE
 applications-rp      1/1     Running   0          1m
 bicep-de             1/1     Running   0          1m
@@ -184,7 +177,7 @@ Verify the credential is registered:
 rad credential list
 ```
 
-```
+```text
 PROVIDER  REGISTERED
 azure     true
 ```
@@ -215,7 +208,7 @@ You can verify the types were created:
 rad resource-type list
 ```
 
-```
+```text
 TYPE                                    NAMESPACE                APIVERSION
 Applications.Core/applications          Applications.Core        ["2023-10-01-preview"]
 ...
@@ -236,6 +229,7 @@ rad bicep publish-extension -f radius/types/agent.yaml --target radius/extension
 rad bicep publish-extension -f radius/types/postgreSqlDatabases.yaml --target radius/extensions/radiusdata.tgz
 rad bicep publish-extension -f radius/types/blobStorages.yaml --target radius/extensions/radiusstorage.tgz
 ```
+
 </details>
 
 ### Step 6: Create the Radius Environment
@@ -305,7 +299,7 @@ Now lets look at the recipes added to the environment. A Recipe defines *how* to
 rad recipe list
 ```
 
-```
+```text
 RECIPE    TYPE                              TEMPLATE KIND  TEMPLATE
 default   Radius.AI/agents                  bicep          ghcr.io/radius-project/lab/recipes/agent:1.0
 default   Radius.Data/postgreSqlDatabases   bicep          ghcr.io/radius-project/lab/recipes/postgres:1.0
@@ -451,7 +445,7 @@ The deployment will take approximately 15-20 minutes to complete. In the meantim
 
 When the deployment is complete, you should see output similar to:
 
-```
+```text
 Deployment In Progress...
 
 Completed            contoso-support-agent   Applications.Core/applications
@@ -482,7 +476,7 @@ Here are some things to try that demonstrate the agentic behavior:
 
 **Simple order lookup** (single tool call):
 
-```
+```text
 What's the status of ORD-10001?
 ```
 
@@ -490,7 +484,7 @@ The agent will call `lookup_order` and respond with the order details from the d
 
 **Policy question** (knowledge base search):
 
-```
+```text
 What's your return policy for electronics?
 ```
 
@@ -498,7 +492,7 @@ The agent will call `search_knowledge_base` and respond using information from t
 
 **Multi-step tool chaining** (multiple tool calls in sequence):
 
-```
+```text
 I want to return the headphones from order ORD-10001. Can you help?
 ```
 
@@ -511,7 +505,7 @@ The agent will:
 
 **Escalation** (knowing when to hand off):
 
-```
+```text
 This is unacceptable, I've been waiting 3 weeks and nobody can help me. I want to speak to a manager.
 ```
 
