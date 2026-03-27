@@ -73,6 +73,7 @@ PROVIDERS=(
   Microsoft.OperationalInsights
   Microsoft.Search
   Microsoft.CognitiveServices
+  Microsoft.ContainerService
 )
 for provider in "${PROVIDERS[@]}"; do
   az provider register --namespace "$provider" --wait 2>/dev/null || true
