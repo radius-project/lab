@@ -65,7 +65,7 @@ Before you begin, you need:
 > - Git Bash
 > - Azure Cloud Shell
 >
-> PowerShell users can follow along with minor syntax adjustments (examples provided where needed).
+> `jq` is required for parsing JSON output in Bash. Install it depending on the bash environment. PowerShell users can follow along with minor syntax adjustments (examples provided where needed).
 
 ---
 
@@ -91,6 +91,9 @@ Run the setup script to create an Azure resource group, AKS cluster, service pri
 **PowerShell**
 
 ```powershell
+
+(Get-Content .\scripts\setup-azure.sh -Raw) -replace "`r`n","`n" | Set-Content .\scripts\setup-azure.sh -Encoding UTF8
+
 bash ./scripts/setup-azure.sh --location westus3 --resource-group customer-support-agent --cluster-name customer-support-agent-aks
 ```
 
@@ -394,7 +397,7 @@ Get the storage account name (provisioned by the blobstorage recipe):
 
 ```bash
 STORAGE_ACCOUNT=$(az storage account list --resource-group customer-support-agent \
-  --query "[?tags.\"radius-resource-type\"=='Radius.Storage/blobStorages'].name" -o tsv)
+  --query "[].name" -o tsv)
 ```
 
 Upload all PDFs to the `documents` container:
@@ -413,10 +416,7 @@ az storage blob upload-batch \
 Get the storage account name (provisioned by the blobstorage recipe):
 
 ```powershell
-$STORAGE_ACCOUNT = az storage account list `
-  --resource-group customer-support-agent `
-  --query "[?tags.`"radius-resource-type`"=='Radius.Storage/blobStorages'].name" `
-  -o tsv
+$STORAGE_ACCOUNT= az storage account list ` --resource-group customer-support-agent ` --query "[].{Name:name}" ` --output tsv      
 ```
 
 Upload all PDFs to the 'documents' container:

@@ -39,6 +39,17 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+# Sanitize variables for cross-platform compatibility (remove CRLF remnants)
+sanitize() {
+  # remove carriage returns if present
+  printf '%s' "$1" | tr -d '\r'
+}
+
+RESOURCE_GROUP=$(sanitize "$RESOURCE_GROUP")
+LOCATION=$(sanitize "$LOCATION")
+CLUSTER_NAME=$(sanitize "$CLUSTER_NAME")
+SP_NAME=$(sanitize "$SP_NAME")
+
 # ── 0. Ensure Azure CLI is logged in ─────────────────────
 echo "==> Checking Azure CLI login..."
 if ! az account show &>/dev/null; then
@@ -46,7 +57,7 @@ if ! az account show &>/dev/null; then
   az login
 fi
 
-SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+SUBSCRIPTION_ID=$(sanitize "$(az account show --query id -o tsv)")
 echo "Subscription: $SUBSCRIPTION_ID"
 echo "Resource Group: $RESOURCE_GROUP"
 echo "Location: $LOCATION"
@@ -103,7 +114,7 @@ echo "==> Creating service principal '$SP_NAME' with Owner role..."
 SP_OUTPUT=$(az ad sp create-for-rbac \
   --name "$SP_NAME" \
   --role Owner \
-  --scopes "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP" \
+  --scopes /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP \
   -o json)
 
 CLIENT_ID=$(echo "$SP_OUTPUT" | jq -r '.appId')
