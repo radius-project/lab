@@ -83,13 +83,21 @@ if ($existingCluster) {
 }
 else {
     Write-Host "==> Creating AKS cluster '$ClusterName' (this takes a few minutes)..."
-    New-AzAksCluster `
-        -ResourceGroupName $ResourceGroupName `
-        -Name $ClusterName `
-        -Location $Location `
-        -NodeCount 1 `
-        -NodeVmSize 'Standard_D2s_v3' `
-        -GenerateSshKey
+    $sshKey = Join-Path -Path $HOME -ChildPath '.ssh/id_rsa.pub'
+    $aksParams = @{
+        ResourceGroupName = $ResourceGroupName
+        Name              = $ClusterName
+        Location          = $Location
+        NodeCount         = 1
+        NodeVmSize        = 'Standard_D2s_v3'
+    }
+    if (Test-Path $sshKey) {
+        $aksParams['SshKeyValue'] = $sshKey
+    }
+    else {
+        $aksParams['GenerateSshKey'] = $true
+    }
+    New-AzAksCluster @aksParams
 
     Write-Host '==> Getting AKS credentials...'
     Import-AzAksCredential `
