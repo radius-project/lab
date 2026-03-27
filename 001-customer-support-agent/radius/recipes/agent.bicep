@@ -11,6 +11,9 @@ param location string = resourceGroup().location
 @description('Model version string for the Azure OpenAI deployment')
 param modelVersion string = '2025-04-14'
 
+@description('Timestamp seed for unique resource names (auto-generated)')
+param deploymentId string = utcNow()
+
 var name = context.resource.name
 var application = context.resource.properties.application
 var environment = context.resource.properties.environment
@@ -34,7 +37,7 @@ var storageAccountName = context.resource.connections.?blobstorage.?properties.?
 var storageAccountKey = context.resource.connections.?blobstorage.?properties.?accountKey ?? ''
 var storageContainer = context.resource.connections.?blobstorage.?properties.?container ?? 'documents'
 
-var uniqueSuffix = take(uniqueString(context.resource.id, resourceGroup().id), 8)
+var uniqueSuffix = take(uniqueString(context.resource.id, resourceGroup().id, deploymentId), 8)
 
 var tags = {
   'radius-app': name
