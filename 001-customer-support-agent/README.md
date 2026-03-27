@@ -542,50 +542,25 @@ The agent will recognize the customer's frustration and call `create_support_tic
     **Bash**
 
     ```bash
-    OPENAI_NAME=$(az cognitiveservices account list \
-      --resource-group customer-support-agent \
-      --query "[0].name" -o tsv)
-
-    LOCATION=$(az cognitiveservices account list \
-      --resource-group customer-support-agent \
-      --query "[0].location" -o tsv)
-
-    az cognitiveservices account delete \
-      --name "$OPENAI_NAME" \
-      --resource-group customer-support-agent
+    export OPENAI_NAME=$(az cognitiveservices account list-deleted \
+      --query "[?starts_with(name, 'support-agent-openai')].name | [0]" \
+      -o tsv)
 
     az cognitiveservices account purge \
-      --name "$OPENAI_NAME" \
+      --name $OPENAI_NAME \
       --resource-group customer-support-agent \
-      --location "$LOCATION"
+      --location westus3
     ```
 
     **PowerShell**
 
     ```powershell
-    $OPENAI_NAME = az cognitiveservices account list `
-      --resource-group customer-support-agent `
-      --query "[0].name" -o tsv
-
-    $LOCATION = az cognitiveservices account list `
-      --resource-group customer-support-agent `
-      --query "[0].location" -o tsv
-
-    az cognitiveservices account delete `
-      --name $OPENAI_NAME `
-      --resource-group customer-support-agent
+    $OPENAI_NAME = az cognitiveservices account list-deleted `
+      --query "[?starts_with(name, 'support-agent-openai')].name | [0]" `
+      -o tsv
 
     az cognitiveservices account purge `
       --name $OPENAI_NAME `
-      --resource-group customer-support-agent `
-      --location $LOCATION
-    ```
-
-    **PowerShell**
-
-    ```powershell
-    az cognitiveservices account purge `
-      --name support-agent-openai `
       --resource-group customer-support-agent `
       --location westus3
     ```
@@ -596,7 +571,7 @@ The agent will recognize the customer's frustration and call `create_support_tic
     rad workspace delete azure --yes
     ```
 
-1. Delete config from kubectl:
+2. Delete config from kubectl:
 
     ```bash
     kubectl config delete-context $(kubectl config current-context)
