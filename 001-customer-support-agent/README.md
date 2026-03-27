@@ -419,7 +419,7 @@ Get the storage account name (provisioned by the blobstorage recipe):
 $STORAGE_ACCOUNT = az storage account list `
   --resource-group customer-support-agent `
   --query "[].name" `
-  --output tsv
+  -o tsv
 ```
 
 Upload all PDFs to the 'documents' container:
@@ -579,6 +579,15 @@ The agent will recognize the customer's frustration and call `create_support_tic
       --name $OPENAI_NAME `
       --resource-group customer-support-agent `
       --location $LOCATION
+    ```
+
+    **PowerShell**
+
+    ```powershell
+    az cognitiveservices account purge `
+      --name support-agent-openai `
+      --resource-group customer-support-agent `
+      --location westus3
     ```
 
 1. Delete your Radius workspace:
