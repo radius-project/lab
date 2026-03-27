@@ -541,6 +541,9 @@ The agent will recognize the customer's frustration and call `create_support_tic
 
     **Bash**
 
+    > [!NOTE]
+    > Update `--resource-group` and `--location` below if you used different values in Step 2.
+
     ```bash
     export OPENAI_NAME=$(az cognitiveservices account list-deleted \
       --query "[?starts_with(name, 'support-agent-openai')].name | [0]" \
@@ -571,7 +574,7 @@ The agent will recognize the customer's frustration and call `create_support_tic
     rad workspace delete azure --yes
     ```
 
-2. Delete config from kubectl:
+1. Delete config from kubectl:
 
     ```bash
     kubectl config delete-context $(kubectl config current-context)
