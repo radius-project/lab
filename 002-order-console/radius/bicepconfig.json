@@ -1,0 +1,6 @@
+{
+  "extensions": {
+    "radius": "br:biceptypes.azurecr.io/radius:edge",
+    "radiusdapr": "extensions/radiusdapr.tgz"
+  }
+}

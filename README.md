@@ -1,7 +1,10 @@
 # Radius Labs
 
-Hands-on labs for [Radius](https://radapp.io) - the open-source application platform for cloud-native apps.
+Hands-on labs for [Radius](https://radapp.io) — the open-source application platform for cloud-native apps.
 
 ## Lab Catalog
 
-- [001-customer-support-agent](./001-customer-support-agent/README.md): Deploy a customer support agent application using Radius.
+| Lab | Description |
+|-----|-------------|
+| [001 – Customer Support Agent](./001-customer-support-agent/README.md) | AI-powered customer support agent with Radius Recipes for Azure and AWS |
+| [002 – Order Console](./002-order-console/README.md) | Microservices order-processing app with Dapr and Radius, deployable to Kubernetes or Kubernetes + Azure |
