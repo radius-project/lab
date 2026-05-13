@@ -1,0 +1,79 @@
+namespace: Radius.Dapr
+types:
+  stateStores:
+    description: |
+      Radius.Dapr/stateStores deploys a Dapr state store component.
+      The recipe provisions the backing infrastructure (e.g. PostgreSQL) and the
+      Dapr Component on Kubernetes. Application containers access state exclusively
+      through the Dapr state management API.
+
+      ```
+      extension radius
+      param environment string
+      resource statestore 'Radius.Dapr/stateStores@2025-08-01-preview' = {
+        name: 'statestore'
+        properties: {
+          application: myApplication.id
+          environment: environment
+        }
+      }
+      ```
+    apiVersions:
+      '2025-08-01-preview':
+        schema:
+          type: object
+          properties:
+            environment:
+              type: string
+              description: "(Required) The Radius Environment ID."
+            application:
+              type: string
+              description: "(Optional) The Radius Application ID."
+            size:
+              type: string
+              enum: ['S', 'M', 'L']
+              description: "(Optional) The size of the backing store."
+            componentName:
+              type: string
+              description: "The name of the Dapr state store component."
+              readOnly: true
+          required:
+            - environment
+
+  pubSubBrokers:
+    description: |
+      Radius.Dapr/pubSubBrokers deploys a Dapr pub/sub broker component backed by Kafka.
+      The recipe provisions both the Kafka infrastructure and the Dapr Component on Kubernetes.
+
+      ```
+      extension radius
+      param environment string
+      resource pubsub 'Radius.Dapr/pubSubBrokers@2025-08-01-preview' = {
+        name: 'pubsub'
+        properties: {
+          application: myApplication.id
+          environment: environment
+        }
+      }
+      ```
+    apiVersions:
+      '2025-08-01-preview':
+        schema:
+          type: object
+          properties:
+            environment:
+              type: string
+              description: "(Required) The Radius Environment ID."
+            application:
+              type: string
+              description: "(Optional) The Radius Application ID."
+            componentName:
+              type: string
+              description: "The name of the Dapr pub/sub component."
+              readOnly: true
+            topic:
+              type: string
+              description: "The name of the pub/sub topic."
+              readOnly: true
+          required:
+            - environment
