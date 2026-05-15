@@ -367,6 +367,12 @@ http://localhost:7007/resources/<group>/Applications.Core/applications/order-con
 
 ---
 
+## Further reading
+
+- [Architecture & design walkthrough](./ARCHITECTURE.md) — technical companion to the *Designing for cloud sovereignty with Dapr and Radius* blog post.
+
+---
+
 ## 🧹 Clean up
 
 1. Delete the application:
