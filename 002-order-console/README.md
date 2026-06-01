@@ -12,6 +12,24 @@ Radius solves this by enabling **platform engineers** to define abstract, applic
 
 This sample is an order management console with three microservices communicating via Dapr. A customer creates orders through a Next.js frontend, the orders API persists state and publishes events, and a fulfillment worker processes those events asynchronously.
 
+| Service              | Responsibility                                                       | Dapr building blocks used              |
+|----------------------|----------------------------------------------------------------------|----------------------------------------|
+| `frontend-ui`        | Next.js UI for placing orders and viewing status                     | None (calls `orders-api` over HTTP)    |
+| `orders-api`         | Accept submissions, persist orders, publish order events, expose SSE | State Management, Pub/Sub (publisher)  |
+| `fulfillment-worker` | Subscribe to order events, process fulfillment, update order state   | Pub/Sub (subscriber), State Management |
+
+The services use the `@dapr/dapr` SDK and talk only to Dapr abstractions — never directly to PostgreSQL or Kafka:
+
+```typescript
+// Persist an order via Dapr state (never touches PostgreSQL directly)
+await client.state.save("statestore", [{ key: order.id, value: order }]);
+
+// Publish an order event via Dapr pub/sub (never touches Kafka directly)
+await client.pubsub.publish("pubsub", "orders", { orderId: order.id, status: "created" });
+```
+
+Whether `statestore` and `pubsub` resolve to in-cluster Postgres/Kafka or Azure PostgreSQL/Event Hubs is an environment-level decision — the application code is identical in both cases.
+
 Below is a high-level architecture diagram of the application:
 
 ```
@@ -289,6 +307,8 @@ Recipes are Terraform configurations stored in this Git repository. Because it's
 - `radius/recipes/azure/pubsub/main.tf` — Azure Event Hubs (Kafka-enabled) with a Dapr `pubsub.kafka` component
 
 If you'd like to learn to create and publish your own Recipes, read [this guide](https://docs.radapp.io/guides/recipes/howto-author-recipes/).
+
+The Dapr component *type* (`state.postgresql`, `pubsub.kafka`) is the same in both environments. The *implementation* — connection string, broker URL, credentials, SKU — comes from whichever Recipe ran. The application sees neither.
 </details>
 
 ### Step 5: Deploy the application
@@ -364,12 +384,6 @@ Replace `<group>` with `local` or `azure` depending on which environment you dep
 ```
 http://localhost:7007/resources/<group>/Applications.Core/applications/order-console/application
 ```
-
----
-
-## Further reading
-
-- [Architecture & design walkthrough](./ARCHITECTURE.md) — technical companion to the *Designing for cloud sovereignty with Dapr and Radius* blog post.
 
 ---
 
