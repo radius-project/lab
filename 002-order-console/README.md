@@ -1,36 +1,29 @@
-# Order Console – Microservices with Dapr and Radius
+# Order Management Console – Microservices with Radius and Dapr
 
-This sample demonstrates how to build and deploy a **microservices order-processing application** using [Radius](https://radapp.io), an open-source application platform that enables developers and platform engineers to define, deploy, and manage cloud-native applications across any infrastructure.
+This sample demonstrates how to build and deploy a **microservices order-management application** using [Radius](https://radapp.io), an open-source application platform that enables developers and platform engineers to define, deploy, and manage cloud-native applications across any infrastructure.
 
 ## Why Radius?
 
-Building microservices that run in multiple environments (Kubernetes, Azure, AWS) is painful. A developer who uses [Dapr](https://dapr.io) for state management and pub/sub messaging still has to manually provision the backing infrastructure — a PostgreSQL database, a Kafka broker, or their cloud equivalents — differently in every environment. Configuration drift, inconsistent deployments, and "it works on my machine" issues follow.
+Building microservices that run in multiple environments (Kubernetes, Azure, AWS) is painful. A developer who uses [Dapr](https://dapr.io) for state management and pub/sub messaging still has to manually provision the backing infrastructure — a PostgreSQL database, a Kafka broker, or their cloud equivalents differently in every environment. Configuration drift, inconsistent deployments, and "it works on my machine" issues follow.
 
 Radius solves this by enabling **platform engineers** to define abstract, application-oriented **Resource Types** and, separately, **Recipes** which implement those Resource Types using Infrastructure as Code (IaC). The developer just declares what application resources (a state store, a pub/sub broker, containers) they need in an application definition and Radius handles the deployment of the correct infrastructure for the target environment.
 
-## Order Console Application
+## Order Management Console Application
 
 This sample is an order management console with three microservices communicating via Dapr. A customer creates orders through a Next.js frontend, the orders API persists state and publishes events, and a fulfillment worker processes those events asynchronously.
 
-| Service              | Responsibility                                                       | Dapr building blocks used              |
-|----------------------|----------------------------------------------------------------------|----------------------------------------|
-| `frontend-ui`        | Next.js UI for placing orders and viewing status                     | None (calls `orders-api` over HTTP)    |
-| `orders-api`         | Accept submissions, persist orders, publish order events, expose SSE | State Management, Pub/Sub (publisher)  |
-| `fulfillment-worker` | Subscribe to order events, process fulfillment, update order state   | Pub/Sub (subscriber), State Management |
+<p align="center">
+  <img src="images/order-console.png">
+</p>
 
-The services use the `@dapr/dapr` SDK and talk only to Dapr abstractions — never directly to PostgreSQL or Kafka:
+At the completion of this walkthrough, the Radius application graph will look like:
 
-```typescript
-// Persist an order via Dapr state (never touches PostgreSQL directly)
-await client.state.save("statestore", [{ key: order.id, value: order }]);
+<p align="center">
+  <img src="images/radius-dashboard.png">
+</p>
 
-// Publish an order event via Dapr pub/sub (never touches Kafka directly)
-await client.pubsub.publish("pubsub", "orders", { orderId: order.id, status: "created" });
-```
-
-Whether `statestore` and `pubsub` resolve to in-cluster Postgres/Kafka or Azure PostgreSQL/Event Hubs is an environment-level decision — the application code is identical in both cases.
-
-Below is a high-level architecture diagram of the application:
+<details>
+<summary>Architecture diagram and Dapr usage (click to expand)</summary>
 
 ```
 ┌──────────────┐  POST /api/orders  ┌─────────────┐  Dapr publish  ┌───────┐
@@ -45,15 +38,25 @@ Below is a high-level architecture diagram of the application:
                                     └────────────┘            └────────────────────┘
 ```
 
-<p align="center">
-  <img src="images/order-console.png">
-</p>
+| Component            | What it does                                                         |
+|----------------------|----------------------------------------------------------------------|
+| `orders-api`         | Accept submissions, persist orders, publish order events, expose SSE |
+| `fulfillment-worker` | Subscribe to order events, process fulfillment, update order state   |
+| `frontend-ui`        | Next.js UI for placing orders and viewing status                     |
+| `statestore`         | Dapr state component backed by PostgreSQL                            |
+| `pubsub`             | Dapr pub/sub component backed by Kafka or Azure Event Hubs           |
 
-At the completion of this walkthrough, the Radius application graph will look like:
+The services use the `@dapr/dapr` SDK and talk only to Dapr abstractions — never directly to PostgreSQL or Kafka:
 
-<p align="center">
-  <img src="images/radius-dashboard.png">
-</p>
+```typescript
+// Persist an order via Dapr state (never touches PostgreSQL directly)
+await client.state.save("statestore", [{ key: order.id, value: order }]);
+
+// Publish an order event via Dapr pub/sub (never touches Kafka directly)
+await client.pubsub.publish("pubsub", "orders", { orderId: order.id, status: "created" });
+```
+
+</details>
 
 ## 📁 Repository structure
 
@@ -89,27 +92,14 @@ By the end of this walkthrough, you will:
 
 ## ✅ Prerequisites
 
-Before you begin, you need:
+- [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)
+- [Radius CLI](https://docs.radapp.io/tutorials/install-radius/#install-the-radius-cli)
+- A Kubernetes cluster (or [AKS cluster](https://learn.microsoft.com/azure/aks/) for Azure deployments) with [Dapr](https://docs.dapr.io/operations/hosting/kubernetes/kubernetes-deploy/) installed. Your user must have the **cluster-admin** role.
 
-- A Kubernetes cluster (local or cloud) to host Radius and the application
-- [Radius CLI](https://docs.radapp.io/tutorials/install-radius/#install-the-radius-cli) installed
-- [Radius installed on your Kubernetes cluster](https://docs.radapp.io/tutorials/install-radius/)
-- [Dapr installed on your Kubernetes cluster](https://docs.dapr.io/operations/hosting/kubernetes/kubernetes-deploy/)
-- [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl) installed
-- [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) installed and authenticated (for Azure deployment only)
-- [Azure cloud provider configured in Radius](https://docs.radapp.io/guides/operations/providers/azure-provider/) (for Azure deployment only)
+**For Azure deployment:**
 
-> [!TIP]
-> This walkthrough uses Bash syntax. On Windows, use one of:
->
-> - WSL (recommended)
-> - Git Bash
-> - Azure Cloud Shell
->
-> PowerShell users can follow along with minor syntax adjustments (use backtick `` ` `` for line continuation).
-
-> [!NOTE]
-> Your user must have the Kubernetes **cluster-admin** role to install Radius and deploy the sample application.
+- [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli)
+- [Azure cloud provider configured in Radius](https://docs.radapp.io/guides/operations/providers/azure-provider/)
 
 ---
 
@@ -251,7 +241,7 @@ Deploy containers to Kubernetes and provision PostgreSQL (Azure Database for Pos
 Create an Azure resource group for the infrastructure:
 
 ```bash
-az group create --name order-console --location <location>
+az group create --name order-management-console --location <location>
 ```
 
 Create a Radius resource group and deploy the Azure environment:
@@ -260,8 +250,8 @@ Create a Radius resource group and deploy the Azure environment:
 rad group create azure
 rad deploy radius/environments/azure.bicep --group azure \
   -p azureSubscriptionId=$(az account show --query id -o tsv) \
-  -p azureResourceGroup=order-console \
-  -p location=$(az group show --name order-console --query location -o tsv)
+  -p azureResourceGroup=order-management-console \
+  -p location=$(az group show --name order-management-console --query location -o tsv)
 ```
 
 Create a workspace:
@@ -333,7 +323,7 @@ When the deployment is complete, you should see output similar to:
 ```
 Deployment In Progress...
 
-Completed            order-console   Applications.Core/applications
+Completed            order-management-console   Applications.Core/applications
 Completed            statestore      Radius.Dapr/stateStores
 Completed            pubsub          Radius.Dapr/pubSubBrokers
 Completed            frontend-ui     Applications.Core/containers
@@ -343,7 +333,7 @@ Completed            orders-api      Applications.Core/containers
 Deployment Complete
 
 Resources:
-    order-console   Applications.Core/applications
+    order-management-console   Applications.Core/applications
     frontend-ui     Applications.Core/containers
     fulfillment-worker Applications.Core/containers
     orders-api      Applications.Core/containers
@@ -358,16 +348,16 @@ Port-forward the frontend service to your local machine.
 For the **Kubernetes** environment:
 
 ```bash
-kubectl port-forward svc/frontend-ui 3000:3000 -n local-order-console
+kubectl port-forward svc/frontend-ui 3000:3000 -n local-order-management-console
 ```
 
 For the **Kubernetes + Azure** environment:
 
 ```bash
-kubectl port-forward svc/frontend-ui 3000:3000 -n azure-order-console
+kubectl port-forward svc/frontend-ui 3000:3000 -n azure-order-management-console
 ```
 
-Open **<http://localhost:3000>** in your browser to see the Order Console UI.
+Open **<http://localhost:3000>** in your browser to see the Order Management Console UI.
 
 ### Step 7: Access the Radius dashboard
 
@@ -382,7 +372,7 @@ Open the application graph in your browser:
 Replace `<group>` with `local` or `azure` depending on which environment you deployed:
 
 ```
-http://localhost:7007/resources/<group>/Applications.Core/applications/order-console/application
+http://localhost:7007/
 ```
 
 ---
@@ -392,13 +382,13 @@ http://localhost:7007/resources/<group>/Applications.Core/applications/order-con
 1. Delete the application:
 
     ```bash
-    rad app delete -a order-console
+    rad app delete -a order-management-console
     ```
 
 1. (Azure only) Delete the Azure resource group:
 
     ```bash
-    az group delete --name order-console --yes
+    az group delete --name order-management-console --yes
     ```
 
 1. Delete your Radius workspace:
