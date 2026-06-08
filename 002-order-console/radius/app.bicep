@@ -5,7 +5,7 @@ extension radiusdapr
 param environment string
 
 @description('The application name')
-param applicationName string = 'order-console'
+param applicationName string = 'order-management-console'
 
 @description('Container registry for the application images')
 param registry string = 'ghcr.io/reshrahim'
