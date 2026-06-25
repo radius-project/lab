@@ -60,6 +60,7 @@ $providers = @(
     'Microsoft.OperationalInsights'
     'Microsoft.Search'
     'Microsoft.CognitiveServices'
+    'Microsoft.ContainerService'
 )
 foreach ($provider in $providers) {
     Register-AzResourceProvider -ProviderNamespace $provider | Out-Null
