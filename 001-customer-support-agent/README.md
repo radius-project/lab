@@ -227,7 +227,7 @@ Radius.Storage/blobStorages             Radius.Storage           ["2025-08-01-pr
 <details>
 <summary>Learn about Bicep extensions (click to expand)</summary>
 
-Bicep extensions are needed for each Resource Type to provide type safety and autocompletion in VS Code (when the Bicep extension is installed). These extensions are defined in the `bicepconfig.json` file. As part of this sample, a preconfigured `bicepconfig.json` referencing the pre-generated Bicep extensions in the `radius/extensions/` directory is provided. No action needed.
+Bicep extensions are needed for each Resource Type to provide type safety and autocompletion in VS Code (when the Bicep extension is installed). These extensions are defined in the `bicepconfig.json` file. This sample uses the Radius extension from GHCR and the pre-generated custom Bicep extensions in `radius/extensions/`. See the [Bicep extension migration prerequisites](../README.md#bicep-extension-migration) before restoring or deploying.
 
 If you modify a Resource Type definition, you must regenerate its extension:
 
